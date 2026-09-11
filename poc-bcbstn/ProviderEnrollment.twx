@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Mock TWX Export — Provider Enrollment Workflow
+  Simulates a real IBM Business Automation Workflow process application export.
+  TWX files are ZIP archives; this is the inner process-app XML for demo purposes.
+
+  Application:  ProviderEnrollment
+  Version:      1.0.0
+  BAW Version:  23.0.2 (Heritage Coach era)
+  Author:       BCBSTN BAW Team
+-->
+<process-app name="ProviderEnrollment" acronym="PROVENR" version="1.0.0">
+
+  <!-- ═══════════════════════════════════════════════════════
+       PROCESS DEFINITION
+       Main enrollment process orchestrating human tasks
+  ═══════════════════════════════════════════════════════ -->
+  <process name="Provider Enrollment Process" type="BPD">
+    <documentation>
+      Manages the end-to-end enrollment of a new healthcare provider.
+      Steps: collect provider details → validate license → review and approve → notify provider.
+    </documentation>
+
+    <variables>
+      <variable name="enrollmentRequest" type="ProviderEnrollmentRequest" isInput="true"/>
+      <variable name="providerRecord"    type="ProviderRecord"            isOutput="true"/>
+      <variable name="approvalDecision"  type="String"/>
+      <variable name="validationErrors"  type="String[]"/>
+      <variable name="licenseValid"      type="Boolean"/>
+    </variables>
+
+    <flow>
+      <startEvent name="Enrollment Submitted"/>
+
+      <humanTask name="Collect Provider Details"    coach="ProviderDetailsCoach"    assignment="initiator"/>
+      <humanTask name="Enter Specialty Information" coach="SpecialtyCoach"           assignment="lane:Enrollment Specialists"/>
+      <humanTask name="Enter License Information"   coach="LicenseCoach"             assignment="lane:Enrollment Specialists"/>
+      <humanTask name="Enter Address Information"   coach="AddressCoach"             assignment="lane:Enrollment Specialists"/>
+      <humanTask name="Review and Submit"           coach="ReviewCoach"              assignment="initiator"/>
+
+      <serviceCall name="Validate License"          service="LicenseValidationService"/>
+      <serviceCall name="Submit to Provider System" service="ProviderSystemIntegration"/>
+
+      <gateway name="License Valid?" type="exclusive">
+        <condition variable="licenseValid" operator="equals" value="true"  target="Submit to Provider System"/>
+        <condition variable="licenseValid" operator="equals" value="false" target="Enter License Information"/>
+      </gateway>
+
+      <endEvent name="Enrollment Complete"/>
+    </flow>
+
+    <swimlanes>
+      <lane name="Provider">
+        <tasks>Collect Provider Details, Review and Submit</tasks>
+      </lane>
+      <lane name="Enrollment Specialists">
+        <tasks>Enter Specialty Information, Enter License Information, Enter Address Information</tasks>
+      </lane>
+    </swimlanes>
+  </process>
+
+  <!-- ═══════════════════════════════════════════════════════
+       BUSINESS OBJECTS (Data Types)
+  ═══════════════════════════════════════════════════════ -->
+  <business-objects>
+
+    <business-object name="ProviderEnrollmentRequest">
+      <parameter name="requestId"       type="String"   required="true"/>
+      <parameter name="submissionDate"  type="Date"     required="true"/>
+      <parameter name="providerType"    type="String"   required="true"  validValues="Individual,Group,Facility"/>
+    </business-object>
+
+    <business-object name="ProviderRecord">
+      <!-- Provider Identity -->
+      <parameter name="providerId"      type="String"   required="false" description="System-assigned on approval"/>
+      <parameter name="npi"             type="String"   required="true"  description="National Provider Identifier (10 digits)"/>
+      <parameter name="providerType"    type="String"   required="true"  validValues="Individual,Group,Facility"/>
+      <parameter name="firstName"       type="String"   required="true"/>
+      <parameter name="lastName"        type="String"   required="true"/>
+      <parameter name="organizationName"type="String"   required="false" description="Required for Group/Facility"/>
+      <parameter name="dateOfBirth"     type="Date"     required="false" description="Required for Individual"/>
+      <parameter name="taxId"           type="String"   required="true"  description="SSN or EIN"/>
+      <parameter name="email"           type="String"   required="true"/>
+      <parameter name="phone"           type="String"   required="true"/>
+      <!-- Specialty -->
+      <parameter name="primarySpecialty"  type="String" required="true"/>
+      <parameter name="secondarySpecialty"type="String" required="false"/>
+      <parameter name="boardCertified"    type="Boolean"required="true"/>
+      <parameter name="specialtyCode"     type="String" required="true"  description="NUCC taxonomy code"/>
+      <!-- License -->
+      <parameter name="licenseNumber"     type="String" required="true"/>
+      <parameter name="licenseState"      type="String" required="true"/>
+      <parameter name="licenseExpiry"     type="Date"   required="true"/>
+      <parameter name="deaNumber"         type="String" required="false" description="Drug Enforcement Administration number"/>
+      <parameter name="medicareId"        type="String" required="false"/>
+      <parameter name="medicaidId"        type="String" required="false"/>
+      <!-- Address -->
+      <parameter name="practiceAddress"   type="Address"required="true"/>
+      <parameter name="mailingAddress"    type="Address"required="false"/>
+      <parameter name="sameasPractice"    type="Boolean"required="true"/>
+    </business-object>
+
+    <business-object name="Address">
+      <parameter name="street1"     type="String"  required="true"/>
+      <parameter name="street2"     type="String"  required="false"/>
+      <parameter name="city"        type="String"  required="true"/>
+      <parameter name="state"       type="String"  required="true"/>
+      <parameter name="zip"         type="String"  required="true"/>
+      <parameter name="county"      type="String"  required="false"/>
+    </business-object>
+
+  </business-objects>
+
+  <!-- ═══════════════════════════════════════════════════════
+       HERITAGE COACHES (Legacy UI — what Bob will modernize)
+  ═══════════════════════════════════════════════════════ -->
+  <coaches>
+
+    <coach name="ProviderDetailsCoach" type="HeritageCoach">
+      <documentation>Step 1: Collect basic provider identity information</documentation>
+      <sections>
+        <section name="Provider Type">
+          <controls>
+            <radio   name="providerType"     label="Provider Type"  binding="enrollmentRequest.providerType"
+                     options="Individual|Group|Facility" required="true"/>
+          </controls>
+        </section>
+        <section name="Personal Information">
+          <controls>
+            <text    name="npi"              label="NPI Number"     binding="providerRecord.npi"          required="true"  maxLength="10"/>
+            <text    name="firstName"        label="First Name"     binding="providerRecord.firstName"    required="true"/>
+            <text    name="lastName"         label="Last Name"      binding="providerRecord.lastName"     required="true"/>
+            <text    name="organizationName" label="Org Name"       binding="providerRecord.organizationName"/>
+            <date    name="dateOfBirth"      label="Date of Birth"  binding="providerRecord.dateOfBirth"/>
+            <text    name="taxId"            label="Tax ID"         binding="providerRecord.taxId"        required="true"/>
+            <text    name="email"            label="Email"          binding="providerRecord.email"        required="true"/>
+            <text    name="phone"            label="Phone"          binding="providerRecord.phone"        required="true"/>
+          </controls>
+        </section>
+      </sections>
+      <buttons>
+        <button name="Next" action="next" label="Next"/>
+        <button name="Cancel" action="cancel" label="Cancel"/>
+      </buttons>
+    </coach>
+
+    <coach name="SpecialtyCoach" type="HeritageCoach">
+      <documentation>Step 2: Specialty and taxonomy information</documentation>
+      <sections>
+        <section name="Specialty">
+          <controls>
+            <select  name="primarySpecialty"   label="Primary Specialty"   binding="providerRecord.primarySpecialty"   required="true"/>
+            <select  name="secondarySpecialty" label="Secondary Specialty" binding="providerRecord.secondarySpecialty"/>
+            <text    name="specialtyCode"      label="NUCC Taxonomy Code"  binding="providerRecord.specialtyCode"      required="true"/>
+            <check   name="boardCertified"     label="Board Certified"     binding="providerRecord.boardCertified"/>
+          </controls>
+        </section>
+      </sections>
+      <buttons>
+        <button name="Back" action="back" label="Back"/>
+        <button name="Next" action="next" label="Next"/>
+      </buttons>
+    </coach>
+
+    <coach name="LicenseCoach" type="HeritageCoach">
+      <documentation>Step 3: License and credentials</documentation>
+      <sections>
+        <section name="License Information">
+          <controls>
+            <text    name="licenseNumber"  label="License Number"  binding="providerRecord.licenseNumber"  required="true"/>
+            <select  name="licenseState"   label="License State"   binding="providerRecord.licenseState"   required="true"/>
+            <date    name="licenseExpiry"  label="Expiry Date"     binding="providerRecord.licenseExpiry"  required="true"/>
+          </controls>
+        </section>
+        <section name="Additional Credentials">
+          <controls>
+            <text    name="deaNumber"      label="DEA Number"      binding="providerRecord.deaNumber"/>
+            <text    name="medicareId"     label="Medicare ID"     binding="providerRecord.medicareId"/>
+            <text    name="medicaidId"     label="Medicaid ID"     binding="providerRecord.medicaidId"/>
+          </controls>
+        </section>
+      </sections>
+      <buttons>
+        <button name="Back" action="back" label="Back"/>
+        <button name="Next" action="next" label="Next"/>
+      </buttons>
+    </coach>
+
+    <coach name="AddressCoach" type="HeritageCoach">
+      <documentation>Step 4: Practice and mailing address</documentation>
+      <sections>
+        <section name="Practice Address">
+          <controls>
+            <text    name="street1"   label="Street Address"  binding="providerRecord.practiceAddress.street1"  required="true"/>
+            <text    name="street2"   label="Suite/Unit"      binding="providerRecord.practiceAddress.street2"/>
+            <text    name="city"      label="City"            binding="providerRecord.practiceAddress.city"     required="true"/>
+            <select  name="state"     label="State"           binding="providerRecord.practiceAddress.state"    required="true"/>
+            <text    name="zip"       label="ZIP Code"        binding="providerRecord.practiceAddress.zip"      required="true"/>
+          </controls>
+        </section>
+        <section name="Mailing Address">
+          <controls>
+            <check   name="sameAsPractice" label="Same as Practice Address" binding="providerRecord.sameasPractice"/>
+            <text    name="mstreet1"  label="Street Address"  binding="providerRecord.mailingAddress.street1"/>
+            <text    name="mcity"     label="City"            binding="providerRecord.mailingAddress.city"/>
+            <select  name="mstate"    label="State"           binding="providerRecord.mailingAddress.state"/>
+            <text    name="mzip"      label="ZIP Code"        binding="providerRecord.mailingAddress.zip"/>
+          </controls>
+        </section>
+      </sections>
+      <buttons>
+        <button name="Back" action="back" label="Back"/>
+        <button name="Next" action="next" label="Next"/>
+      </buttons>
+    </coach>
+
+    <coach name="ReviewCoach" type="HeritageCoach">
+      <documentation>Step 5: Review all entered information before submission</documentation>
+      <sections>
+        <section name="Review Summary">
+          <controls>
+            <output  name="reviewNpi"          label="NPI"              binding="providerRecord.npi"/>
+            <output  name="reviewName"         label="Name"             binding="providerRecord.firstName"/>
+            <output  name="reviewSpecialty"    label="Specialty"        binding="providerRecord.primarySpecialty"/>
+            <output  name="reviewLicense"      label="License Number"   binding="providerRecord.licenseNumber"/>
+            <output  name="reviewLicenseState" label="License State"    binding="providerRecord.licenseState"/>
+            <output  name="reviewAddress"      label="Practice Address" binding="providerRecord.practiceAddress.street1"/>
+          </controls>
+        </section>
+      </sections>
+      <buttons>
+        <button name="Back"   action="back"   label="Back"/>
+        <button name="Submit" action="finish" label="Submit Enrollment"/>
+      </buttons>
+    </coach>
+
+  </coaches>
+
+  <!-- ═══════════════════════════════════════════════════════
+       SERVICES (Integration points)
+  ═══════════════════════════════════════════════════════ -->
+  <services>
+
+    <service name="LicenseValidationService" type="integration">
+      <documentation>Validates provider license against state licensing board APIs</documentation>
+      <input  name="licenseNumber" type="String"/>
+      <input  name="licenseState"  type="String"/>
+      <input  name="licenseExpiry" type="Date"/>
+      <output name="isValid"       type="Boolean"/>
+      <output name="errorMessage"  type="String"/>
+      <integration type="REST" endpoint="https://api.internal.bcbstn.com/license-validation/v1/validate"/>
+    </service>
+
+    <service name="ProviderSystemIntegration" type="integration">
+      <documentation>Submits approved provider record to the master provider directory</documentation>
+      <input  name="providerRecord" type="ProviderRecord"/>
+      <output name="providerId"     type="String"/>
+      <output name="status"         type="String"/>
+      <integration type="REST" endpoint="https://api.internal.bcbstn.com/provider-directory/v2/enroll"/>
+    </service>
+
+  </services>
+
+</process-app>
