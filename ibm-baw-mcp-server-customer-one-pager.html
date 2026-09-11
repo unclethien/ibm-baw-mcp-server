@@ -1,0 +1,584 @@
+
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>IBM BAW MCP Server — Customer Brief</title>
+<style>
+  :root {
+    --ibm-blue: #0f62fe;
+    --ibm-black: #161616;
+    --ibm-gray-90: #262626;
+    --ibm-gray-70: #525252;
+    --ibm-gray-10: #f4f4f4;
+    --ibm-green: #24a148;
+    --ibm-teal: #009d9a;
+    --ibm-white: #ffffff;
+    --border: #e0e0e0;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--ibm-black);
+    background: var(--ibm-white);
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 48px 40px 64px;
+  }
+
+  .doc-header {
+    border-bottom: 3px solid var(--ibm-blue);
+    padding-bottom: 24px;
+    margin-bottom: 36px;
+  }
+  .ibm-wordmark {
+    display: inline-block;
+    background: var(--ibm-blue);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    padding: 3px 8px;
+    margin-bottom: 4px;
+  }
+  .ibm-product {
+    display: inline-block;
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--ibm-gray-70);
+    margin-left: 8px;
+    letter-spacing: 0.2px;
+  }
+  .doc-header h1 {
+    font-size: 32px;
+    font-weight: 300;
+    color: var(--ibm-black);
+    line-height: 1.2;
+    margin: 14px 0 6px;
+  }
+  .doc-header h1 strong { font-weight: 600; }
+  .doc-subtitle {
+    font-size: 15px;
+    color: var(--ibm-gray-70);
+    font-weight: 300;
+    font-style: italic;
+  }
+  .doc-meta {
+    display: flex;
+    gap: 24px;
+    margin-top: 14px;
+    flex-wrap: wrap;
+  }
+  .doc-meta-item {
+    font-size: 11px;
+    color: var(--ibm-gray-70);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+  }
+  .doc-meta-item strong {
+    color: var(--ibm-black);
+    font-weight: 600;
+    text-transform: none;
+    letter-spacing: 0;
+    font-size: 12px;
+  }
+
+  .lead {
+    background: var(--ibm-blue);
+    color: #fff;
+    padding: 24px 28px;
+    margin-bottom: 36px;
+  }
+  .lead p {
+    font-size: 16px;
+    font-weight: 300;
+    line-height: 1.65;
+  }
+  .lead strong { font-weight: 500; }
+
+  section { margin-bottom: 36px; }
+  h2 {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--ibm-blue);
+    margin-bottom: 14px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+  }
+  h3 {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--ibm-black);
+    margin-bottom: 8px;
+  }
+  p {
+    font-size: 14px;
+    color: var(--ibm-gray-90);
+    line-height: 1.65;
+    margin-bottom: 12px;
+  }
+  p:last-child { margin-bottom: 0; }
+
+  .arch-diagram {
+    background: var(--ibm-gray-10);
+    border: 1px solid var(--border);
+    padding: 28px 24px;
+    margin: 16px 0;
+  }
+  .arch-flow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    flex-wrap: wrap;
+  }
+  .arch-node {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 6px;
+  }
+  .arch-box {
+    padding: 10px 16px;
+    border: 1px solid var(--border);
+    background: #fff;
+    font-size: 13px;
+    font-weight: 500;
+    min-width: 110px;
+    text-align: center;
+    line-height: 1.3;
+  }
+  .arch-box.highlight {
+    background: var(--ibm-blue);
+    color: #fff;
+    border-color: var(--ibm-blue);
+  }
+  .arch-box.baw {
+    background: var(--ibm-gray-90);
+    color: #fff;
+    border-color: var(--ibm-gray-90);
+  }
+  .arch-label {
+    font-size: 11px;
+    color: var(--ibm-gray-70);
+    max-width: 110px;
+  }
+  .arch-arrow {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 4px;
+    min-width: 60px;
+    gap: 2px;
+  }
+  .arch-arrow-line {
+    font-size: 20px;
+    color: var(--ibm-blue);
+    line-height: 1;
+  }
+  .arch-arrow-text {
+    font-size: 10px;
+    color: var(--ibm-gray-70);
+    text-align: center;
+  }
+
+  .card-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin: 16px 0;
+  }
+  .card {
+    border: 1px solid var(--border);
+    padding: 16px;
+    background: #fff;
+  }
+  .card-icon { font-size: 20px; margin-bottom: 8px; }
+  .card h4 { font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+  .card p { font-size: 13px; color: var(--ibm-gray-70); margin: 0; line-height: 1.5; }
+
+  .compare {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    margin: 16px 0;
+  }
+  .compare-col { background: #fff; padding: 16px; }
+  .compare-header {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 10px;
+  }
+  .compare-col.before .compare-header { color: #a2191f; }
+  .compare-col.after .compare-header { color: var(--ibm-green); }
+  .compare-col ul { list-style: none; padding: 0; }
+  .compare-col li {
+    font-size: 13px;
+    padding: 5px 0;
+    border-bottom: 1px solid var(--ibm-gray-10);
+    color: var(--ibm-gray-90);
+    line-height: 1.4;
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+  }
+  .compare-col li:last-child { border-bottom: none; }
+  .compare-col.before li::before { content: '\2715'; color: #a2191f; font-size: 11px; flex-shrink: 0; margin-top: 2px; }
+  .compare-col.after li::before { content: '\2713'; color: var(--ibm-green); font-size: 11px; flex-shrink: 0; margin-top: 2px; }
+
+  table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 13px; }
+  th {
+    background: var(--ibm-gray-90);
+    color: #fff;
+    text-align: left;
+    padding: 10px 12px;
+    font-weight: 500;
+    font-size: 12px;
+  }
+  td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    color: var(--ibm-gray-90);
+    line-height: 1.5;
+  }
+  tr:nth-child(even) td { background: var(--ibm-gray-10); }
+  .tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 10px;
+  }
+  .tag-yes { background: #defbe6; color: #0e6027; }
+  .tag-no  { background: #fff1f1; color: #a2191f; }
+
+  .poc-box {
+    border: 1px solid var(--ibm-teal);
+    border-left: 4px solid var(--ibm-teal);
+    background: #f0fafa;
+    padding: 20px 24px;
+    margin: 16px 0;
+  }
+  .poc-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--ibm-teal);
+    margin-bottom: 8px;
+  }
+  .poc-box h3 { font-size: 16px; margin-bottom: 8px; color: var(--ibm-black); }
+  .poc-box p { font-size: 13px; color: var(--ibm-gray-90); margin-bottom: 8px; }
+  .poc-quote {
+    background: #fff;
+    border-left: 3px solid var(--ibm-teal);
+    padding: 10px 14px;
+    font-style: italic;
+    color: var(--ibm-black);
+    margin: 12px 0;
+    font-size: 13px;
+  }
+  .poc-steps { display: flex; gap: 4px; margin-top: 14px; flex-wrap: wrap; }
+  .poc-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    flex: 1;
+    min-width: 120px;
+    padding: 10px 10px;
+    background: #fff;
+    border: 1px solid var(--border);
+  }
+  .poc-step-num {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--ibm-teal);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .poc-step-text { font-size: 12px; line-height: 1.4; color: var(--ibm-gray-90); }
+  .poc-step-text strong { display: block; font-weight: 600; color: var(--ibm-black); margin-bottom: 2px; }
+
+  .req-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin: 16px 0;
+  }
+  .req-item {
+    display: flex;
+    gap: 10px;
+    padding: 10px 12px;
+    background: var(--ibm-gray-10);
+    border: 1px solid var(--border);
+    font-size: 13px;
+    align-items: flex-start;
+  }
+  .req-key { font-weight: 600; color: var(--ibm-black); min-width: 80px; flex-shrink: 0; }
+  .req-val { color: var(--ibm-gray-70); line-height: 1.4; }
+
+  code {
+    background: var(--ibm-gray-10);
+    padding: 1px 6px;
+    font-size: 12px;
+    font-family: 'Courier New', monospace;
+  }
+
+  ol { padding-left: 20px; }
+  ol li { font-size: 13px; color: var(--ibm-gray-90); line-height: 2; }
+
+  .doc-footer {
+    margin-top: 48px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    text-align: center;
+    color: var(--ibm-gray-70);
+    font-size: 11px;
+  }
+</style>
+</head>
+<body>
+
+<div class="doc-header">
+  <div>
+    <span class="ibm-wordmark">IBM</span>
+    <span class="ibm-product">Business Automation Workflow</span>
+  </div>
+  <h1><strong>BAW MCP Server</strong></h1>
+  <div class="doc-subtitle">Connecting AI Agents to Business Automation Workflows</div>
+  <div class="doc-meta">
+    <div class="doc-meta-item">Version <strong>1.0.11</strong></div>
+    <div class="doc-meta-item">Requires <strong>BAW 25.0.1+</strong></div>
+    <div class="doc-meta-item">License <strong>Apache 2.0 (Open Source)</strong></div>
+    <div class="doc-meta-item">Client <strong>watsonx Orchestrate</strong></div>
+  </div>
+</div>
+
+<div class="lead">
+  <p>Your organization has invested years building business workflows in IBM Business Automation Workflow. The <strong>BAW MCP Server</strong> makes every one of those workflows instantly accessible to AI agents — through natural language, with no additional API development, no custom connectors, and no changes to your existing BAW applications.</p>
+</div>
+
+<section>
+  <h2>What It Does</h2>
+  <p>The BAW MCP Server is a bridge between AI agents and your BAW environment. It automatically discovers every exposed REST service in your BAW installation at startup and publishes them as AI-callable tools — ready for any MCP-compatible agent to invoke by description, not by API signature.</p>
+  <div class="arch-diagram">
+    <div class="arch-flow">
+      <div class="arch-node">
+        <div class="arch-box">AI Agent<br /><small style="font-weight:300;font-size:11px">watsonx Orchestrate</small></div>
+        <div class="arch-label">Natural language request</div>
+      </div>
+      <div class="arch-arrow">
+        <div class="arch-arrow-line">→</div>
+        <div class="arch-arrow-text">MCP protocol<br />(stdio / HTTP)</div>
+      </div>
+      <div class="arch-node">
+        <div class="arch-box highlight">BAW MCP<br />Server</div>
+        <div class="arch-label">Auto-discovers &amp; exposes tools</div>
+      </div>
+      <div class="arch-arrow">
+        <div class="arch-arrow-line">→</div>
+        <div class="arch-arrow-text">BAW REST API<br />(HTTPS)</div>
+      </div>
+      <div class="arch-node">
+        <div class="arch-box baw">IBM BAW 25<br /><small style="font-weight:300;font-size:11px">Process Apps</small></div>
+        <div class="arch-label">Existing workflows unchanged</div>
+      </div>
+    </div>
+  </div>
+  <p><strong>No changes to BAW are required.</strong> Any REST service already exposed in BAW automatically becomes an AI tool. The MCP server discovers them at startup — the AI selects and calls them from plain English input.</p>
+</section>
+
+<section>
+  <h2>Why It Matters</h2>
+  <div class="card-grid">
+    <div class="card">
+      <div class="card-icon">⚡</div>
+      <h4>Zero integration effort</h4>
+      <p>No custom connectors, no API wrappers. Expose a REST service in BAW once — it is immediately available as an AI tool.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🔄</div>
+      <h4>Reuses existing investment</h4>
+      <p>Every workflow built in BAW becomes an AI capability. Years of automation work, instantly accessible to agents.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🗣</div>
+      <h4>Natural language interface</h4>
+      <p>Users interact in plain English. The AI selects the right workflow, fills parameters, and submits — no form required.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🔒</div>
+      <h4>Secure by design</h4>
+      <p>Credentials never leave your environment. The server runs locally alongside the AI client — no cloud intermediary for BAW credentials.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>Before and After</h2>
+  <div class="compare">
+    <div class="compare-col before">
+      <div class="compare-header">Without MCP Server</div>
+      <ul>
+        <li>User fills BAW Process Portal forms manually</li>
+        <li>Developer writes a custom API wrapper per workflow</li>
+        <li>Each new AI integration requires new connector code</li>
+        <li>AI cannot discover or call BAW services autonomously</li>
+        <li>Workflow changes require connector updates</li>
+      </ul>
+    </div>
+    <div class="compare-col after">
+      <div class="compare-header">With MCP Server</div>
+      <ul>
+        <li>User describes intent in natural language to AI agent</li>
+        <li>MCP server auto-discovers all exposed REST services at startup</li>
+        <li>Every new exposed service is instantly a new AI tool — zero code</li>
+        <li>AI selects, parameterizes, and calls BAW workflows autonomously</li>
+        <li>BAW changes propagate automatically — no connector updates</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>Customer Story — BCBSTN POC Context</h2>
+  <div class="poc-box">
+    <div class="poc-label">Blue Cross Blue Shield of Tennessee · POC Scenario</div>
+    <h3>Provider Enrollment via AI Agent</h3>
+    <p>BCBSTN operates a large-scale Provider Enrollment workflow in BAW. Today, specialists fill out multi-step Heritage Coach forms manually — provider details, specialty, license, address — one task at a time.</p>
+    <p>With the BAW MCP Server and watsonx Orchestrate, an enrollment specialist could instead say:</p>
+    <div class="poc-quote">
+      "Enroll Dr. John Smith, NPI 1234567890, Internal Medicine, license TN MD-12345 expiring June 2027, practice at 123 Medical Center Drive Nashville TN 37203."
+    </div>
+    <p>The AI calls the <code>ProvEnrl_SubmitEnrollment</code> MCP tool, fills all parameters from the natural language input, and submits the BAW workflow — in seconds, with no form.</p>
+    <div class="poc-steps">
+      <div class="poc-step">
+        <div class="poc-step-num">1</div>
+        <div class="poc-step-text"><strong>Expose REST service</strong>in BAW Process Designer</div>
+      </div>
+      <div class="poc-step">
+        <div class="poc-step-num">2</div>
+        <div class="poc-step-text"><strong>MCP server starts</strong>auto-discovers the tool</div>
+      </div>
+      <div class="poc-step">
+        <div class="poc-step-num">3</div>
+        <div class="poc-step-text"><strong>wxO agent configured</strong>with MCP toolkit</div>
+      </div>
+      <div class="poc-step">
+        <div class="poc-step-num">4</div>
+        <div class="poc-step-text"><strong>Specialist chats</strong>in natural language</div>
+      </div>
+      <div class="poc-step">
+        <div class="poc-step-num">5</div>
+        <div class="poc-step-text"><strong>BAW workflow runs</strong>enrollment submitted</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>When to Use It</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Scenario</th>
+        <th>MCP Server?</th>
+        <th>Notes</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>AI agent submits a BAW workflow via natural language</td>
+        <td><span class="tag tag-yes">✓ Yes</span></td>
+        <td>Core use case — exactly what this server does</td>
+      </tr>
+      <tr>
+        <td>AI agent queries workflow status or retrieves data</td>
+        <td><span class="tag tag-yes">✓ Yes</span></td>
+        <td>Any exposed REST GET service becomes a query tool</td>
+      </tr>
+      <tr>
+        <td>Automated agent monitors and acts on BAW tasks</td>
+        <td><span class="tag tag-yes">✓ Yes</span></td>
+        <td>Agent can check and update workflow instances</td>
+      </tr>
+      <tr>
+        <td>Modernizing BAW Heritage Coach UI to Carbon</td>
+        <td><span class="tag tag-no">✕ No</span></td>
+        <td>UI generation task — Bob does it from TWX directly</td>
+      </tr>
+      <tr>
+        <td>Documenting or analyzing a BAW application</td>
+        <td><span class="tag tag-no">✕ No</span></td>
+        <td>Bob reads TWX files directly — no live BAW needed</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <h2>Requirements</h2>
+  <div class="req-grid">
+    <div class="req-item">
+      <div class="req-key">BAW version</div>
+      <div class="req-val">IBM BAW 25.0.1+ or CP4BA 25.0.1+</div>
+    </div>
+    <div class="req-item">
+      <div class="req-key">Runtime</div>
+      <div class="req-val">Python 3.12+ with uv package manager</div>
+    </div>
+    <div class="req-item">
+      <div class="req-key">MCP client</div>
+      <div class="req-val">IBM watsonx Orchestrate (SaaS or Developer Edition)</div>
+    </div>
+    <div class="req-item">
+      <div class="req-key">BAW setup</div>
+      <div class="req-val">At least one Exposed REST Service configured in BAW</div>
+    </div>
+    <div class="req-item">
+      <div class="req-key">Auth</div>
+      <div class="req-val">Basic auth (USERID/PASSWORD) or Zen API key (CP4BA)</div>
+    </div>
+    <div class="req-item">
+      <div class="req-key">Network</div>
+      <div class="req-val">MCP client must reach BAW server on HTTPS (port 9443)</div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>Getting Started</h2>
+  <p>Open source under Apache 2.0, available on GitHub. Fastest path to a running demo:</p>
+  <ol>
+    <li>Install: <code>uvx --from git+https://github.com/ibmbpm/ibm-baw-mcp-server ibm-baw-mcp-server</code></li>
+    <li>Set environment variables: <code>ENDPOINT</code>, <code>USERID</code>, <code>PASSWORD</code></li>
+    <li>Register as a toolkit in watsonx Orchestrate</li>
+    <li>Any BAW exposed REST service is now an AI tool — no further configuration required</li>
+  </ol>
+  <p style="margin-top:12px">For demos without a live BAW environment, a mock server can simulate the exposed services endpoint locally in minutes.</p>
+</section>
+
+<div class="doc-footer">
+  IBM Business Automation Workflow MCP Server  ·  v1.0.11  ·  Apache License 2.0  ·  github.com/ibmbpm/ibm-baw-mcp-server  ·  Made with IBM Bob
+</div>
+
+</body>
+</html>
